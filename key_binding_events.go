@@ -135,6 +135,7 @@ func arrowLeftAction(g *gocui.Gui, v *gocui.View) error {
 	hostsItemIdx := getCurrentHostsItemIndex()
 	hItems[hostsItemIdx].toggleHostsItemSwitch(false)
 	hItemCursorChanged = true
+	jsonencodeHostsInfoToPath(dataPath, hItems)
 	hItemsToSystemHosts(hItems)
 
 	return nil
@@ -144,6 +145,7 @@ func arrowRightAction(g *gocui.Gui, v *gocui.View) error {
 	hostsItemIdx := getCurrentHostsItemIndex()
 	hItems[hostsItemIdx].toggleHostsItemSwitch(true)
 	hItemCursorChanged = true
+	jsonencodeHostsInfoToPath(dataPath, hItems)
 	hItemsToSystemHosts(hItems)
 
 	return nil

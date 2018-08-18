@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"log"
+	"runtime"
 )
 
 func setSystemHosts(content string) {
@@ -21,7 +22,25 @@ func hItemsToSystemHosts(hosts []hostsItem) {
 		}
 	}
 
-	appendToFile("/tmp/yrt", ret)
-
 	setSystemHosts(ret)
+}
+
+func getUserHome() string {
+	home := ""
+	if runtime.GOOS == "windows" {
+		home = os.Getenv("USERPROFILE")
+	} else {
+		home = os.Getenv("HOME")
+	}
+
+	return home
+}
+
+func getWinSystemDir() string {
+	dir := ""
+	if runtime.GOOS == "windows" {
+		dir = os.Getenv("windir")
+	}
+
+	return dir
 }

@@ -7,14 +7,34 @@ import (
 	"fmt"
 	"github.com/jroimartin/gocui"
 	"regexp"
-	"strconv"
+	"path/filepath"
+	"runtime"
 )
 
 func fileExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil { return true, nil }
 	if os.IsNotExist(err) { return false, nil }
-	return true, err
+	return false, err
+}
+
+func gohostsInit()  {
+	userHome := getUserHome()
+
+	gohostsDataDir := filepath.Join(userHome, ".gohosts")
+	// 判断文件夹是否存在，不存在创建
+	if exist, _ := fileExists(gohostsDataDir); !exist {
+		os.Mkdir(gohostsDataDir, os.ModePerm)
+	}
+
+	dataPath = filepath.Join(gohostsDataDir, "hostsItems.json")
+	initFalgPath = filepath.Join(gohostsDataDir, "initFlag")
+
+	hostsPath = "/etc/hosts"
+	if runtime.GOOS == "windows" {
+		hostsPath = getWinSystemDir()
+		hostsPath = filepath.Join(hostsPath, "system32", "drivers", "etc", "hosts")
+	}
 }
 
 func hostsItemInit() error {
@@ -73,7 +93,7 @@ func jsonencodeHostsInfoToPath(path string, hItems []hostsItem) error {
 	if b, err := json.Marshal(hItems); err != nil {
 		return err
 	} else {
-		if err := ioutil.WriteFile(path, b, 0644); err != nil {
+		if err := ioutil.WriteFile(path, b, os.ModePerm); err != nil {
 			return err
 		}
 	}
@@ -236,7 +256,6 @@ func getCurrentHostsItemIndex() int {
 	ret := 0
 
 	ret = slideCursorY + slideOriginY
-	appendToFile("/tmp/yrt", strconv.Itoa(slideCursorY) + "," + strconv.Itoa(slideOriginY) + "\n")
 
 	return ret
 }

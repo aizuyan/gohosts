@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	dataPath string = "/tmp/hosts-data/hostsItems"
-	initFalgPath string = "/tmp/hosts-data/hostsItemsInit"
-	hostsPath string = "/etc/hosts"
+	dataPath string = ""
+	initFalgPath string = ""
+	hostsPath string = ""
 
 	// global terminal size，change on func layout
 	maxX, maxY int
@@ -60,8 +60,11 @@ func main() {
 	}
 	defer g.Close()
 
-	hItems = jsondecodeHostsInfoFromPath(dataPath)
+	// 初始化变量
+	gohostsInit()
 
+	hItems = jsondecodeHostsInfoFromPath(dataPath)
+	
 	// 初始化
 	hostsItemInit()
 
