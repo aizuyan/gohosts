@@ -65,6 +65,13 @@ func KeyBindingAction(g *gocui.Gui) error {
 			shiftAAction,
 		},
 		{
+			// 删除hosts item, 组合键 Shift + D TODO
+			"slide",
+			'D',
+			gocui.ModNone,
+			shiftDAction,
+		},
+		{
 			// new-hosts-item-msg view 上面按下回车
 			"new-hosts-item-msg",
 			gocui.KeyEnter,
@@ -128,6 +135,7 @@ func arrowLeftAction(g *gocui.Gui, v *gocui.View) error {
 	hostsItemIdx := getCurrentHostsItemIndex()
 	hItems[hostsItemIdx].toggleHostsItemSwitch(false)
 	hItemCursorChanged = true
+	hItemsToSystemHosts(hItems)
 
 	return nil
 }
@@ -136,6 +144,7 @@ func arrowRightAction(g *gocui.Gui, v *gocui.View) error {
 	hostsItemIdx := getCurrentHostsItemIndex()
 	hItems[hostsItemIdx].toggleHostsItemSwitch(true)
 	hItemCursorChanged = true
+	hItemsToSystemHosts(hItems)
 
 	return nil
 }
@@ -198,5 +207,9 @@ func newHostsItemMsgEnterAction(g *gocui.Gui, v *gocui.View) error {
 	}
 	slideOriginY = len(hItems) - getSlideRowCount() - 1
 	hItemCursorChanged = true
+	return nil
+}
+
+func shiftDAction(g *gocui.Gui, view *gocui.View) error {
 	return nil
 }

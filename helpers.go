@@ -6,6 +6,7 @@ import (
 	"os"
 	"fmt"
 	"github.com/jroimartin/gocui"
+	"regexp"
 )
 
 
@@ -99,16 +100,6 @@ func getCurrentTabViewName() string {
 	return viewName
 }
 
-// 设置变量到下一个tabview
-func setNexTabView() error {
-	index := tabViewIndex + 1
-	if index >= len(tabViews) {
-		index = 0
-	}
-	tabViewIndex = index
-	return nil
-}
-
 // 渲染一个view中的内容 Editable 有bug，更新之后，不能edit
 func renderString(g *gocui.Gui, viewName, s string) error {
 	g.Update(func(g *gocui.Gui) error {
@@ -194,7 +185,12 @@ func adjustCursorOrigin() error {
 	return nil
 }
 
-// 获取真实的
+func setCurrentHostsItemContent(content string) {
+	idx := getCurrentHostsItemIndex()
+	hItems[idx].Content = content
+}
+
+// 获取真实的索引
 func getCurrentHostsItemIndex() int {
 	ret := 0
 
@@ -206,5 +202,33 @@ func getCurrentHostsItemIndex() int {
 func getCurrentHostsItemContent() string {
 	ret := ""
 	ret = hItems[getCurrentHostsItemIndex()].Content
+	return ret
+}
+
+
+
+func checkHostsItemLine(line string) bool {
+	if ret, err := regexp.Match("^#.*", []byte(line)); err != nil {
+		return false
+	} else {
+		if ret {
+			return true
+		}
+	}
+
+
+	if ret, err := regexp.Match("^[    ]*$", []byte(line)); err != nil {
+		return false
+	} else {
+		if ret {
+			return true
+		}
+	}
+
+	ret, err := regexp.Match("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:[  ]{1,})(?:[ 0-9a-zA-Z._-]{1,}){1,}$", []byte(line))
+	if err != nil {
+		return false
+	}
+
 	return ret
 }

@@ -71,6 +71,10 @@ func main() {
 		log.Panicln(err)
 	}
 
+	// 校验语法
+	go checkSyntax()
+
+	// 循环开始
 	if err := g.MainLoop();  err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
 	}
