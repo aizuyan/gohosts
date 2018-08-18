@@ -207,6 +207,7 @@ func newHostsItemMsgEnterAction(g *gocui.Gui, v *gocui.View) error {
 	}
 	slideOriginY = len(hItems) - getSlideRowCount() - 1
 	hItemCursorChanged = true
+	mainContentChanged = true
 	return nil
 }
 

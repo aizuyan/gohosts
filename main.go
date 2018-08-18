@@ -11,6 +11,7 @@ import (
 
 var (
 	dataPath string = "/tmp/hosts-data/hostsItems"
+	initFalgPath string = "/tmp/hosts-data/hostsItemsInit"
 	hostsPath string = "/etc/hosts"
 
 	// global terminal size，change on func layout
@@ -60,6 +61,9 @@ func main() {
 	defer g.Close()
 
 	hItems = jsondecodeHostsInfoFromPath(dataPath)
+
+	// 初始化
+	hostsItemInit()
 
 	g.Highlight = true
 	g.Cursor = true

@@ -7,8 +7,43 @@ import (
 	"fmt"
 	"github.com/jroimartin/gocui"
 	"regexp"
+	"strconv"
 )
 
+func fileExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil { return true, nil }
+	if os.IsNotExist(err) { return false, nil }
+	return true, err
+}
+
+func hostsItemInit() error {
+	//
+	exists, err := fileExists(initFalgPath)
+
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return nil
+	}
+
+	if backup, err := ioutil.ReadFile(hostsPath); err != nil {
+		return err
+	} else {
+		hItems = append(hItems, hostsItem{
+			"backup",
+			string(backup),
+			true,
+		})
+		jsonencodeHostsInfoToPath(dataPath, hItems)
+	}
+
+	ioutil.WriteFile(initFalgPath, []byte{'y', 'e', 's'}, os.ModePerm)
+
+	return nil
+}
 
 func appendToFile(fileName string, content string) error {
 	// 以只写的模式，打开文件
@@ -178,8 +213,14 @@ func adjustCursorOrigin() error {
 	} else if gap < 0 {
 		slideCursorY += gap
 		slideOriginY -= gap
-	} else {
+	}
 
+	if slideCursorY < 0 {
+		slideCursorY = 0
+	}
+
+	if slideOriginY < 0 {
+		slideOriginY = 0
 	}
 
 	return nil
@@ -195,6 +236,7 @@ func getCurrentHostsItemIndex() int {
 	ret := 0
 
 	ret = slideCursorY + slideOriginY
+	appendToFile("/tmp/yrt", strconv.Itoa(slideCursorY) + "," + strconv.Itoa(slideOriginY) + "\n")
 
 	return ret
 }

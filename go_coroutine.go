@@ -22,6 +22,9 @@ func checkSyntax() {
 				}
 				newBuffer := "\n" + strings.Join(lines, "\n")
 				renderString(g, "main", newBuffer)
+				if newBuffer[len(newBuffer) - 1] != '\n' {
+					newBuffer += "\n"
+				}
 				// 写入数据库
 				setCurrentHostsItemContent(newBuffer)
 				jsonencodeHostsInfoToPath(dataPath, hItems)
