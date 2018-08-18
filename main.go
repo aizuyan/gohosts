@@ -30,6 +30,8 @@ var (
 	// tab键切换view，当前停留的view索引
 	tabViewIndex int = 0
 
+	onMsgView bool = false
+
 	// red color string factory
 	red func(a ...interface{}) string = color.New(color.FgRed).SprintFunc()
 
@@ -112,7 +114,7 @@ func layout(g *gocui.Gui) error {
 		v.Editable = true
 		v.Title = "Hosts Item Content"
 	}
-	appendToFile("/tmp/yrt", "HHHAHSHASs\n")
+
 	if mainContentChanged {
 		renderString(g, "main", getCurrentHostsItemContent())
 		mainContentChanged = false

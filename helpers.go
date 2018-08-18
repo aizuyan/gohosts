@@ -33,6 +33,27 @@ func jsondecodeHostsInfoFromPath(path string) []hostsItem {
 	return items
 }
 
+func jsonencodeHostsInfoToPath(path string, hItems []hostsItem) error {
+	if b, err := json.Marshal(hItems); err != nil {
+		return err
+	} else {
+		if err := ioutil.WriteFile(path, b, 0644); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func marshal() []byte {
+	b, err := json.Marshal(hItems)
+	if err != nil {
+		return []byte{}
+	}
+	return b
+}
+
+
 // 从数据文件中读取配置信息
 func getHostsItems(path string) []byte {
 	b, err := ioutil.ReadFile(path)
@@ -44,7 +65,9 @@ func getHostsItems(path string) []byte {
 }
 
 func setCursorView(g *gocui.Gui) {
-	setViewOnTop(g, getCurrentTabViewName())
+	if !onMsgView {
+		setViewOnTop(g, getCurrentTabViewName())
+	}
 }
 
 func refreshEnd(g *gocui.Gui) {
@@ -152,16 +175,20 @@ func getSlideRowCount() int {
 
 func adjustCursorOrigin() error {
 	gap := getSlideRowCount() - slideCursorY
-	if gap > 0 && slideOriginY > 0 {
-		slideCursorY += gap
-		slideOriginY -= gap
+	if gap > 0 {
+		if slideOriginY > 0 {
+			slideCursorY += gap
+			slideOriginY -= gap
 
-		if slideOriginY < 0 {
-			slideOriginY = 0
+			if slideOriginY < 0 {
+				slideOriginY = 0
+			}
 		}
 	} else if gap < 0 {
 		slideCursorY += gap
 		slideOriginY -= gap
+	} else {
+
 	}
 
 	return nil
