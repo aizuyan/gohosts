@@ -64,7 +64,7 @@ func main() {
 	gohostsInit()
 
 	hItems = jsondecodeHostsInfoFromPath(dataPath)
-	
+
 	// 初始化
 	hostsItemInit()
 
