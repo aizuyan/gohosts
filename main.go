@@ -101,11 +101,6 @@ func layout(g *gocui.Gui) error {
 		renderStringOriginCursor(
 			g, "slide", hostsNameToString(hItems),
 			slideOriginX, slideOriginY, slideCursorX, slideCursorY)
-		if hItemChanged {
-			hItemChanged = false
-		} else if hItemCursorChanged {
-			hItemCursorChanged = false
-		}
 	}
 
 	// main

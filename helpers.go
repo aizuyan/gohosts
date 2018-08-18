@@ -53,6 +53,11 @@ func refreshEnd(g *gocui.Gui) {
 		setOrigin(g, "main", 0, 0)
 		hItemCursorChanged = !hItemCursorChanged
 	}
+
+
+	if hItemChanged {
+		hItemChanged = !hItemChanged
+	}
 }
 
 // 设置当前view聚焦
