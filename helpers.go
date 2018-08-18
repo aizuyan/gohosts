@@ -3,7 +3,6 @@ package main
 import (
 	"io/ioutil"
 	"encoding/json"
-	"errors"
 	"os"
 	"fmt"
 	"github.com/jroimartin/gocui"
@@ -44,22 +43,32 @@ func getHostsItems(path string) []byte {
 	return b
 }
 
+func setCursorView(g *gocui.Gui) {
+	setViewOnTop(g, getCurrentTabViewName())
+}
+
+func refreshEnd(g *gocui.Gui) {
+	if hItemCursorChanged {
+		setCursor(g, "main", 0, 0)
+		setOrigin(g, "main", 0, 0)
+		hItemCursorChanged = !hItemCursorChanged
+	}
+}
+
+// 设置当前view聚焦
+func setViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
+	if _, err := g.SetCurrentView(name); err != nil {
+		return nil, err
+	}
+	return g.SetViewOnTop(name)
+}
+
+
 // 获取当前所聚焦的tabView名称
 func getCurrentTabViewName() string {
 	viewName := tabViews[tabViewIndex]
 
 	return viewName
-}
-
-// 设置当前tabviews切换到哪一个view的索引
-func setCurrentTabViewIndex(index int) error {
-	if len(tabViews) < index {
-		return errors.New("out of tab views range")
-	}
-
-	tabViewIndex = index
-
-	return nil
 }
 
 // 设置变量到下一个tabview
@@ -72,18 +81,18 @@ func setNexTabView() error {
 	return nil
 }
 
-// 渲染一个view中的内容
+// 渲染一个view中的内容 Editable 有bug，更新之后，不能edit
 func renderString(g *gocui.Gui, viewName, s string) error {
-	g.Update(func(*gocui.Gui) error {
+	g.Update(func(g *gocui.Gui) error {
 		v, err := g.View(viewName)
 		// just in case the view disappeared as this function was called, we'll
 		// silently return if it's not found
 		if err != nil {
-			return nil
+			return err
 		}
+		v.Wrap = true
 		v.Clear()
 		fmt.Fprint(v, s)
-		v.Wrap = true
 		return nil
 	})
 	return nil
@@ -105,6 +114,27 @@ func renderStringOriginCursor(g *gocui.Gui, viewName, s string, originX, originY
 		v.Wrap = true
 		return nil
 	})
+	return nil
+}
+
+func setCursor(g *gocui.Gui, viewName string, cursorX, cursorY int) error {
+	v, err := g.View(viewName)
+	if err != nil {
+		return err
+	}
+	if err := v.SetCursor(cursorX, cursorY); err != nil {
+		return err
+	}
+	return nil
+}
+func setOrigin(g *gocui.Gui, viewName string, originX, originY int) error {
+	v, err := g.View(viewName)
+	if err != nil {
+		return err
+	}
+	if err := v.SetOrigin(originX, originY); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -130,4 +160,19 @@ func adjustCursorOrigin() error {
 	}
 
 	return nil
+}
+
+// 获取真实的
+func getCurrentHostsItemIndex() int {
+	ret := 0
+
+	ret = slideCursorY + slideOriginY
+
+	return ret
+}
+
+func getCurrentHostsItemContent() string {
+	ret := ""
+	ret = hItems[getCurrentHostsItemIndex()].Content
+	return ret
 }

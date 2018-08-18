@@ -5,6 +5,7 @@ import (
 	"log"
 	"github.com/fatih/color"
 	"errors"
+	"math/rand"
 	"strconv"
 )
 
@@ -20,8 +21,6 @@ var (
 
 	// hosts item 实例列表，存储hosts的名称、内容、是否开启状态
 	hItems []hostsItem
-	// hosts item 当前聚焦的实例索引
-	hItemIndex int = 0
 
 	// tab键切换支持的view列表
 	tabViews []string = []string{
@@ -37,6 +36,17 @@ var (
 	// TODO resize cursor origin
 	slideOriginX, slideOriginY int = 0, 0
 	slideCursorX, slideCursorY int = 0, 0
+
+	// hItems是否切换过
+	hItemCursorChanged bool = false
+
+	// mainContent 中的内容是否改变过；切换hosts改变
+	mainContentChanged bool = true
+
+	// hosts Item 中的内容是否改变；添加hosts item的时候改变
+	hItemChanged bool = true
+
+
 )
 
 func main() {
@@ -87,9 +97,16 @@ func layout(g *gocui.Gui) error {
 		v.Title= "Hosts Items"
 	}
 	// 重新绘制slide中的内容，包括设置偏移和焦点
-	renderStringOriginCursor(
-		g, "slide", hostsNameToString(hItems),
-		slideOriginX, slideOriginY, slideCursorX, slideCursorY)
+	if hItemChanged || hItemCursorChanged {
+		renderStringOriginCursor(
+			g, "slide", hostsNameToString(hItems),
+			slideOriginX, slideOriginY, slideCursorX, slideCursorY)
+		if hItemChanged {
+			hItemChanged = false
+		} else if hItemCursorChanged {
+			hItemCursorChanged = false
+		}
+	}
 
 	// main
 	if v, err := g.SetView("main",41, 0, maxX - 1, maxY - 2); err != nil {
@@ -98,9 +115,13 @@ func layout(g *gocui.Gui) error {
 		}
 		v.Wrap = true
 		v.Editable = true
-		v.Title = "Hosts Info"
+		v.Title = "Hosts Item Content"
 	}
-	renderString(g, "main", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n" + strconv.Itoa(getSlideRowCount()))
+	appendToFile("/tmp/yrt", "HHHAHSHASs\n")
+	if mainContentChanged {
+		renderString(g, "main", getCurrentHostsItemContent())
+		mainContentChanged = false
+	}
 
 	// 操作提示
 	if v, err := g.SetView("footer", 0, maxY - 2, maxX, maxY); err != nil {
@@ -109,10 +130,13 @@ func layout(g *gocui.Gui) error {
 		}
 		v.SelFgColor = gocui.ColorMagenta
 		v.Frame = false
+		renderString(
+			g, "footer",
+			"help: `tab`: switch view; `↑` `↓` change hosts item; " +
+				"`←` `→` toggle hosts item; `shift + a` add hosts item; `shift + q` cansle add action" + strconv.Itoa(rand.Int()))
 	}
-	renderString(
-		g, "footer",
-		"help: `tab`: switch view; `↑` `↓` change hosts item; " +
-			"`←` `→` toggle hosts item; `shift + a` add hosts item; `shift + q` cansle add action")
+
+	setCursorView(g)
+	refreshEnd(g)
 	return nil
 }

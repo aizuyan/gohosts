@@ -22,18 +22,39 @@ func KeyBindingAction(g *gocui.Gui) error {
 			quit,
 		},
 		{
-			// 关闭软件，组合按键，Ctrl + C
+			// 切换view，tab键
 			"",
+			gocui.KeyTab,
+			gocui.ModNone,
+			changeTab,
+		},
+		{
+			// 关闭软件，组合按键，Ctrl + C
+			"slide",
 			gocui.KeyArrowUp,
 			gocui.ModNone,
 			arrowUpAction,
 		},
 		{
 			// 关闭软件，组合按键，Ctrl + C
-			"",
+			"slide",
 			gocui.KeyArrowDown,
 			gocui.ModNone,
 			arrowDownAction,
+		},
+		{
+			// 关闭hosts item 左箭头
+			"slide",
+			gocui.KeyArrowLeft,
+			gocui.ModNone,
+			arrowLeftAction,
+		},
+		{
+			// 打开hosts item 右箭头
+			"slide",
+			gocui.KeyArrowRight,
+			gocui.ModNone,
+			arrowRightAction,
 		},
 	}
 
@@ -50,9 +71,18 @@ func quit(g *gocui.Gui, view *gocui.View) error {
 	return gocui.ErrQuit
 }
 
+func changeTab(g *gocui.Gui, view *gocui.View) error {
+	tabViewIndex++
+	if tabViewIndex >= len(tabViews) {
+		tabViewIndex = 0
+	}
+	return nil
+}
+
+
 func arrowDownAction(g *gocui.Gui, v *gocui.View) error {
 	// 到底了
-	if slideCursorY + slideOriginY > len(hItems) - 2 {
+	if slideCursorY+slideOriginY > len(hItems)-2 {
 		return nil
 	}
 
@@ -61,6 +91,8 @@ func arrowDownAction(g *gocui.Gui, v *gocui.View) error {
 	} else {
 		slideOriginY++
 	}
+	hItemCursorChanged = true
+	mainContentChanged = true
 
 	return nil
 }
@@ -71,6 +103,22 @@ func arrowUpAction(g *gocui.Gui, v *gocui.View) error {
 	} else if slideCursorY > 0 {
 		slideCursorY--
 	}
+	hItemCursorChanged = true
+	mainContentChanged = true
+
+	return nil
+}
+
+func arrowLeftAction(g *gocui.Gui, v *gocui.View) error {
+	hostsItemIdx := getCurrentHostsItemIndex()
+	hItems[hostsItemIdx].toggleHostsItemSwitch(false)
+
+	return nil
+}
+
+func arrowRightAction(g *gocui.Gui, v *gocui.View) error {
+	hostsItemIdx := getCurrentHostsItemIndex()
+	hItems[hostsItemIdx].toggleHostsItemSwitch(true)
 
 	return nil
 }

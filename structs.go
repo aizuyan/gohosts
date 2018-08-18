@@ -7,9 +7,18 @@ type hostsItem struct {
 	Toggle bool
 }
 
+func (h *hostsItem) toggleHostsItemSwitch(flag bool) {
+	h.Toggle = flag
+}
+
 func hostsNameToString(hosts []hostsItem) string {
 	ret := ""
 	for _, h := range hosts {
+		if h.Toggle {
+			ret += "√ "
+		} else {
+			ret += "× "
+		}
 		ret += h.HostsName + "\n"
 	}
 
