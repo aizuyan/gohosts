@@ -5,8 +5,6 @@ import (
 	"log"
 	"github.com/fatih/color"
 	"errors"
-	"math/rand"
-	"strconv"
 )
 
 var (
@@ -36,6 +34,9 @@ var (
 	// red color string factory
 	red func(a ...interface{}) string = color.New(color.FgRed).SprintFunc()
 
+	// green color string factory
+	green func(a ...interface{}) string = color.New(color.FgGreen).SprintFunc()
+
 	// TODO resize cursor origin
 	slideOriginX, slideOriginY int = 0, 0
 	slideCursorX, slideCursorY int = 0, 0
@@ -48,8 +49,6 @@ var (
 
 	// hosts Item 中的内容是否改变；添加hosts item的时候改变
 	hItemChanged bool = true
-
-
 )
 
 func main() {
@@ -141,7 +140,7 @@ func layout(g *gocui.Gui) error {
 		renderString(
 			g, "footer",
 			"help: `tab`: switch view; `↑` `↓` change hosts item; " +
-				"`←` `→` toggle hosts item; `shift + a` add hosts item; `shift + q` cansle add action" + strconv.Itoa(rand.Int()))
+				"`←` `→` toggle hosts item; `shift + a` add hosts item; `shift + q` cansle add action")
 	}
 
 	setCursorView(g)

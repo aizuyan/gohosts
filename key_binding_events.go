@@ -169,10 +169,11 @@ func shiftAAction(g *gocui.Gui, v *gocui.View) error {
 
 // 判断输入的名称是否合法
 func checkHostsItemName(hostsName string) bool {
-	if hostsName == "" {
-		return  false
+	// 长度小于35
+	if len(hostsName) > 35 {
+		return false
 	}
-
+	// 不能和已有的名称重复
 	for _, host := range hItems {
 		if host.HostsName == hostsName {
 			return false
@@ -186,30 +187,35 @@ func newHostsItemMsgEnterAction(g *gocui.Gui, v *gocui.View) error {
 	// 输入的名称
 	hostsName := v.ViewBuffer()
 	hostsName = strings.Trim(hostsName, "\n ")
+
+
+	//appendToFile("/tmp/yrt", hostsName + "， " + strconv.Itoa(len(hostsName)) + "###1\n")
 	if !checkHostsItemName(hostsName) {
 		// 提示不合法 TODO
-
+		return nil
 	}
-	hItems = append(hItems, hostsItem{
-		hostsName,
-		"# " + hostsName + " config\n",
-		false,
-	})
 
-
+	if hostsName != "" {
+		hItems = append(hItems, hostsItem{
+			hostsName,
+			"# " + hostsName + " config\n",
+			false,
+		})
+		jsonencodeHostsInfoToPath(dataPath, hItems)
+		// 调整鼠标焦点
+		slideCursorY = getSlideRowCount()
+		if len(hItems) - 1 < slideCursorY {
+			slideCursorY = len(hItems) - 1
+		}
+		slideOriginY = len(hItems) - getSlideRowCount() - 1
+		hItemCursorChanged = true
+		mainContentChanged = true
+	}
 	if err := g.DeleteView("new-hosts-item-msg"); err != nil {
 		return err
 	}
 	onMsgView = false
-	jsonencodeHostsInfoToPath(dataPath, hItems)
-	// 调整鼠标焦点
-	slideCursorY = getSlideRowCount()
-	if len(hItems) - 1 < slideCursorY {
-		slideCursorY = len(hItems) - 1
-	}
-	slideOriginY = len(hItems) - getSlideRowCount() - 1
-	hItemCursorChanged = true
-	mainContentChanged = true
+
 	return nil
 }
 

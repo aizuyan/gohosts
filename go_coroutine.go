@@ -8,12 +8,13 @@ import (
 func checkSyntax() {
 	old := ""
 	for range time.Tick(time.Millisecond * 50) {
-		mainView := g.CurrentView()
-		if "main" == mainView.Name(){
-			mainBuffer := mainView.Buffer()
+		view := g.CurrentView()
+		viewName := view.Name()
+		if "main" == viewName{
+			mainBuffer := view.Buffer()
 			if old != mainBuffer {
 				old = mainBuffer
-				lines := mainView.ViewBufferLines()
+				lines := view.ViewBufferLines()
 
 				for idx, line := range lines {
 					if false == checkHostsItemLine(line) {
@@ -31,6 +32,14 @@ func checkSyntax() {
 
 				// 提现到系统hosts中
 				hItemsToSystemHosts(hItems)
+			}
+		} else if "new-hosts-item-msg" == viewName {
+			hostsName := view.ViewBuffer()
+			hostsName = strings.Trim(hostsName, "\n ")
+			if !checkHostsItemName(hostsName) {
+				renderString(g, "new-hosts-item-msg", red(hostsName))
+			} else {
+				renderString(g, "new-hosts-item-msg", green(hostsName))
 			}
 		}
 	}
