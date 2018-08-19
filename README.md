@@ -25,6 +25,6 @@ sudo gohosts
 ```
 
 ## mac 效果
-![](./gohosts_32.gif)
+![](./images/gohosts_32.gif)
 
 ![](./images/mac.png)
