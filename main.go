@@ -8,6 +8,9 @@ import (
 )
 
 var (
+	// 系统版本
+	version string = "0.2.0"
+
 	dataPath string = ""
 	initFalgPath string = ""
 	hostsPath string = ""
@@ -36,6 +39,9 @@ var (
 
 	// green color string factory
 	green func(a ...interface{}) string = color.New(color.FgGreen).SprintFunc()
+
+	cyan func(a ...interface{}) string = color.New(color.FgCyan).SprintFunc()
+
 
 	// TODO resize cursor origin
 	slideOriginX, slideOriginY int = 0, 0
@@ -140,7 +146,8 @@ func layout(g *gocui.Gui) error {
 		renderString(
 			g, "footer",
 			"help: `tab`: switch view; `↑` `↓` change hosts item; " +
-				"`←` `→` toggle hosts item; `shift + a` add hosts item; `shift + q` cansle add action")
+				"`←` `→` toggle hosts item; `shift + a` add hosts item; `shift + q` cansle add action" +
+				cyan("\t\t version: " + version))
 	}
 
 	setCursorView(g)
